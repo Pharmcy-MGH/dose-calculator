@@ -2,72 +2,117 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
+  <title>حاسبة جرعة الباراسيتامول للأطفال</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>حاسبة الجرعة</title>
   <style>
-    body { font-family: system-ui; max-width: 680px; margin: 24px auto; padding: 0 16px; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; }
-    label { display:block; margin-top: 12px; }
-    input { width: 100%; padding: 10px; border:1px solid #ccc; border-radius: 10px; }
-    button { margin-top: 16px; padding: 10px 14px; border:0; border-radius: 10px; cursor:pointer; }
-    .result { margin-top: 16px; padding: 12px; background:#f7f7f7; border-radius: 10px; }
-    small { color:#666; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 15px;
+      background: #f8f9fa;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.08);
+    }
+    h2 { margin-top: 0; }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 12px;
+      border: none;
+      background: #0d6efd;
+      color: white;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f1f3f5;
+      border-radius: 12px;
+    }
+    small {
+      color: #555;
+      display: block;
+      margin-top: 10px;
+    }
   </style>
 </head>
+
 <body>
-  <h2>حاسبة جرعة (مثال)</h2>
   <div class="card">
-    <label>الوزن (kg)</label>
-    <input id="wt" type="number" step="0.1" min="0" placeholder="مثال: 70" />
+    <h2>💊 حاسبة جرعة الباراسيتامول للأطفال</h2>
 
-    <label>التركيز (mg لكل قرص/مل) — اختياري</label>
-    <input id="strength" type="number" step="0.1" min="0" placeholder="مثال: 250" />
+    <label>وزن الطفل (كجم)</label>
+    <input id="weight" type="number" step="0.1" placeholder="مثال: 12" />
 
-    <button onclick="calc()">احسب</button>
+    <button onclick="calculateDose()">احسب الجرعة</button>
 
-    <div id="out" class="result" style="display:none;"></div>
-    <p><small>
-      تنبيه: هذه الحاسبة للاستخدام المهني فقط ويجب مطابقة النتائج مع البروتوكول/المرجع وتقييم الحالة (العمر، وظائف كلى/كبد، التداخلات…).
-    </small></p>
+    <div id="output" class="result" style="display:none;"></div>
+
+    <small>
+      ⚠️ للاستخدام من قبل الممارسين الصحيين فقط.  
+      الجرعة تعتمد على الوزن والحالة السريرية ويجب عدم تجاوز الحد الأقصى اليومي.
+    </small>
   </div>
 
 <script>
-function round(x, d=1){ return Math.round(x * (10**d)) / (10**d); }
+function round(value, decimals = 1) {
+  return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+}
 
-function calc(){
-  const wt = parseFloat(document.getElementById('wt').value);
-  const strength = parseFloat(document.getElementById('strength').value);
-
-  if(!wt || wt<=0){
-    alert("دخل وزن صحيح");
+function calculateDose() {
+  const weight = parseFloat(document.getElementById("weight").value);
+  if (!weight || weight <= 0) {
+    alert("الرجاء إدخال وزن صحيح");
     return;
   }
 
-  // ====== عدّل هنا معادلتك ======
-  // مثال: حد أدنى وحد أقصى على أساس mg/kg/day
-  const min_mg_per_kg = 5;   // غيّرها حسب الدواء/البروتوكول
-  const max_mg_per_kg = 10;  // غيّرها حسب الدواء/البروتوكول
-  const minDoseMg = wt * min_mg_per_kg;
-  const maxDoseMg = wt * max_mg_per_kg;
-  // =============================
+  // Paracetamol pediatric dosing
+  const minMgKg = 10;
+  const maxMgKg = 15;
+  const maxDailyMgKg = 60;
 
-  let html = `
-    <b>النتيجة</b><br/>
-    الحد الأدنى: <b>${round(minDoseMg,1)} mg/day</b><br/>
-    الحد الأقصى: <b>${round(maxDoseMg,1)} mg/day</b><br/>
+  // Concentration: 120 mg / 5 mL = 24 mg/mL
+  const concentration = 24;
+
+  const minDoseMg = weight * minMgKg;
+  const maxDoseMg = weight * maxMgKg;
+  const minDoseMl = minDoseMg / concentration;
+  const maxDoseMl = maxDoseMg / concentration;
+  const maxDailyMg = weight * maxDailyMgKg;
+
+  const output = document.getElementById("output");
+  output.style.display = "block";
+  output.innerHTML = `
+    <b>النتيجة:</b><br><br>
+    🔹 الجرعة الواحدة:<br>
+    ${round(minDoseMg)} – ${round(maxDoseMg)} mg<br>
+    (${round(minDoseMl)} – ${round(maxDoseMl)} mL)<br><br>
+
+    ⏱️ تُعطى كل 4–6 ساعات<br><br>
+
+    🔺 الحد الأقصى اليومي:<br>
+    ${round(maxDailyMg)} mg/day
   `;
-
-  if(strength && strength > 0){
-    html += `<hr/>
-      على تركيز ${strength} mg:
-      <br/>الحد الأدنى ≈ <b>${round(minDoseMg/strength,2)}</b> وحدة/يوم
-      <br/>الحد الأقصى ≈ <b>${round(maxDoseMg/strength,2)}</b> وحدة/يوم
-    `;
-  }
-
-  const out = document.getElementById('out');
-  out.innerHTML = html;
-  out.style.display = 'block';
 }
 </script>
 </body>
