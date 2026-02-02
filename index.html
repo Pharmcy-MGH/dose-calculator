@@ -131,7 +131,8 @@ function round(value, decimals = 1) {
   return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
 }
 
-function calculateDose() {
+function calculateDose() document.getElementById("drugInfo").style.display = "block";
+{
   const weight = parseFloat(document.getElementById("weight").value);
   if (!weight || weight <= 0) {
     alert("الرجاء إدخال وزن صحيح");
