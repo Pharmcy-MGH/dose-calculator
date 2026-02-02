@@ -131,15 +131,14 @@ function round(value, decimals = 1) {
   return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
 }
 
-function calculateDose() document.getElementById("drugInfo").style.display = "block";
-{
+function calculateDose() {
   const weight = parseFloat(document.getElementById("weight").value);
   if (!weight || weight <= 0) {
     alert("الرجاء إدخال وزن صحيح");
     return;
   }
 
-  const concentration = 24; // mg per mL
+  const concentration = 24; // mg per mL (120 mg / 5 mL)
 
   let resultText = "";
 
@@ -176,6 +175,9 @@ function calculateDose() document.getElementById("drugInfo").style.display = "bl
   const output = document.getElementById("output");
   output.style.display = "block";
   output.innerHTML = resultText;
+
+  // ✅ إظهار معلومات الدواء بعد ظهور النتيجة
+  document.getElementById("drugInfo").style.display = "block";
 }
 </script>
 </body>
