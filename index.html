@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      font-family: system-ui;
       max-width: 700px;
       margin: 30px auto;
       padding: 15px;
@@ -59,7 +59,7 @@
 
 <body>
   <div class="card">
-    <h2>💊 حاسبة جرعة الباراسيتامول للأطفال</h2>
+    <h2>💊 حاسبة جرعة الباراسيتامول للأطفال (شراب)</h2>
 
     <label>وزن الطفل (كجم)</label>
     <input id="weight" type="number" step="0.1" placeholder="مثال: 12" />
@@ -70,7 +70,7 @@
 
     <small>
       ⚠️ للاستخدام من قبل الممارسين الصحيين فقط.  
-      الجرعة تعتمد على الوزن والحالة السريرية ويجب عدم تجاوز الحد الأقصى اليومي.
+      التركيز: 120 mg / 5 mL — الجرعات محسوبة بالمل فقط.
     </small>
   </div>
 
@@ -86,33 +86,43 @@ function calculateDose() {
     return;
   }
 
-  // Paracetamol pediatric dosing
-  const minMgKg = 10;
-  const maxMgKg = 15;
-  const maxDailyMgKg = 60;
+  const concentration = 24; // mg per mL
 
-  // Concentration: 120 mg / 5 mL = 24 mg/mL
-  const concentration = 24;
+  let resultText = "";
 
-  const minDoseMg = weight * minMgKg;
-  const maxDoseMg = weight * maxMgKg;
-  const minDoseMl = minDoseMg / concentration;
-  const maxDoseMl = maxDoseMg / concentration;
-  const maxDailyMg = weight * maxDailyMgKg;
+  // ≥ 40 kg → fixed dose 500 mg
+  if (weight >= 40) {
+    const fixedDoseMg = 500;
+    const fixedDoseMl = fixedDoseMg / concentration;
+
+    resultText = `
+      <b>النتيجة:</b><br><br>
+      🔹 الجرعة الواحدة الثابتة:<br>
+      <b>${round(fixedDoseMl)} mL</b><br><br>
+      ⏱️ تُعطى كل 4–6 ساعات<br>
+      🔺 لا تتجاوز 4 جرعات في اليوم
+    `;
+  } 
+  // < 40 kg → weight-based dosing
+  else {
+    const minMgKg = 10;
+    const maxMgKg = 15;
+
+    const minDoseMl = (weight * minMgKg) / concentration;
+    const maxDoseMl = (weight * maxMgKg) / concentration;
+
+    resultText = `
+      <b>النتيجة:</b><br><br>
+      🔹 الجرعة الواحدة:<br>
+      <b>${round(minDoseMl)} – ${round(maxDoseMl)} mL</b><br><br>
+      ⏱️ تُعطى كل 4–6 ساعات<br>
+      🔺 لا تتجاوز 4 جرعات في اليوم
+    `;
+  }
 
   const output = document.getElementById("output");
   output.style.display = "block";
-  output.innerHTML = `
-    <b>النتيجة:</b><br><br>
-    🔹 الجرعة الواحدة:<br>
-    ${round(minDoseMg)} – ${round(maxDoseMg)} mg<br>
-    (${round(minDoseMl)} – ${round(maxDoseMl)} mL)<br><br>
-
-    ⏱️ تُعطى كل 4–6 ساعات<br><br>
-
-    🔺 الحد الأقصى اليومي:<br>
-    ${round(maxDailyMg)} mg/day
-  `;
+  output.innerHTML = resultText;
 }
 </script>
 </body>
