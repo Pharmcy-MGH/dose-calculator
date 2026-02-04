@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <title>حاسبة جرعة أزيثروميسين للأطفال (3 أيام)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 15px;
+      background: #f8f9fa;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.08);
+    }
+    h2 { margin-top: 0; }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 12px;
+      border: none;
+      background: #198754;
+      color: white;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f1f3f5;
+      border-radius: 12px;
+    }
+    small {
+      color: #555;
+      display: block;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+    .pill {
+      display:inline-block;
+      padding: 4px 10px;
+      background:#e9ecef;
+      border-radius: 999px;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>💊 حاسبة جرعة أزيثروميسين للأطفال (Suspension)</h2>
+    <div class="pill">النظام: 10 mg/kg مرة يوميًا لمدة 3 أيام</div>
+    <div class="pill">التركيز: 200 mg / 5 mL</div>
+
+    <label>وزن الطفل (كجم)</label>
+    <input id="weight" type="number" step="0.1" placeholder="مثال: 18" />
+
+    <button onclick="calculateDose()">احسب الجرعة</button>
+
+    <div id="output" class="result" style="display:none;"></div>
+
+    <small>
+      ⚠️ للاستخدام من قبل الممارسين الصحيين فقط.  
+      النتائج بالمل فقط. تم تطبيق حد أقصى يومي شائع (500 mg/day).
+    </small>
+  </div>
+
+<script>
+function round(value, decimals = 1) {
+  return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+}
+
+function calculateDose() {
+  const weight = parseFloat(document.getElementById("weight").value);
+  if (!weight || weight <= 0) {
+    alert("الرجاء إدخال وزن صحيح");
+    return;
+  }
+
+  // Concentration: 200 mg / 5 mL => 40 mg/mL
+  const concentration = 40;
+
+  // Dose: 10 mg/kg once daily x 3 days
+  let dailyMg = weight * 10;
+
+  // Max cap (commonly used)
+  const maxDailyMg = 500;
+  dailyMg = Math.min(dailyMg, maxDailyMg);
+
+  // Convert to mL
+  const dailyMl = dailyMg / concentration;
+
+  const output = document.getElementById("output");
+  output.style.display = "block";
+  output.innerHTML = `
+    <b>النتيجة (بالمل):</b><br><br>
+    🔹 <b>الجرعة اليومية:</b> ${round(dailyMl)} mL مرة واحدة يوميًا<br>
+    🔹 <b>المدة:</b> 3 أيام<br><br>
+    📅 <b>الجدول:</b><br>
+    اليوم 1: ${round(dailyMl)} mL<br>
+    اليوم 2: ${round(dailyMl)} mL<br>
+    اليوم 3: ${round(dailyMl)} mL
+  `;
+}
+</script>
+</body>
+</html>
